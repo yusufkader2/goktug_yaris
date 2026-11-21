@@ -8,13 +8,16 @@
 <meta name="mobile-web-app-capable" content="yes">
 <title>GÖKTUĞ 3D Turbo Yarış</title>
 <style>
-  * {
+  *, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    user-select: none;
-    -webkit-user-select: none;
-    -webkit-touch-callout: none;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    -webkit-touch-callout: none !important;
+    -webkit-tap-highlight-color: transparent !important;
   }
   html, body {
     width: 100%;
@@ -24,6 +27,12 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     color: #fff;
     touch-action: none;
+    overscroll-behavior: none;
+  }
+  button {
+    touch-action: none;
+    outline: none;
+    font-family: inherit;
   }
   #gameCanvas {
     position: fixed;
@@ -33,7 +42,6 @@
     display: block;
     z-index: 1;
   }
-  /* Speed lines effect during Turbo */
   #speedLines {
     position: fixed;
     inset: 0;
@@ -47,66 +55,72 @@
   #speedLines.active {
     opacity: 1;
   }
-  /* Top Fixed HUD */
+
+  /* Top Fixed HUD - Adaptive for narrow portrait & wide landscape */
   #hudTop {
     position: fixed;
-    top: max(10px, env(safe-area-inset-top));
-    left: max(10px, env(safe-area-inset-left));
-    right: max(10px, env(safe-area-inset-right));
+    top: max(8px, env(safe-area-inset-top));
+    left: max(8px, env(safe-area-inset-left));
+    right: max(8px, env(safe-area-inset-right));
     z-index: 10;
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    gap: 6px;
+    align-items: stretch;
+    gap: 4px;
     pointer-events: none;
   }
   .hud-group {
     display: flex;
-    gap: 6px;
-    align-items: center;
+    gap: 4px;
+    align-items: stretch;
+    min-width: 0;
   }
   .hud-box {
-    background: rgba(10, 16, 30, 0.82);
+    background: rgba(10, 16, 30, 0.84);
     border: 1.5px solid rgba(255, 255, 255, 0.18);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    border-radius: 12px;
-    padding: 6px 10px;
+    border-radius: 10px;
+    padding: 5px 6px;
     text-align: center;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     font-variant-numeric: tabular-nums;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
-  /* Fixed widths so numbers never jitter or resize boxes */
-  .w-speed { width: 88px; }
-  .w-rpm   { width: 84px; }
-  .w-nos   { width: 105px; }
-  .w-time  { width: 92px; }
-  .w-stars { width: 78px; }
+  .w-speed { width: clamp(58px, 16vw, 88px); }
+  .w-rpm   { width: clamp(56px, 15vw, 84px); }
+  .w-nos   { width: clamp(66px, 18vw, 105px); }
+  .w-stars { width: clamp(54px, 14vw, 78px); }
+  .w-time  { width: clamp(58px, 15vw, 86px); }
 
   .hud-label {
-    font-size: 10px;
+    font-size: clamp(8px, 2.1vw, 10px);
     font-weight: 700;
-    letter-spacing: 0.8px;
+    letter-spacing: 0.4px;
     color: #94a3b8;
     text-transform: uppercase;
     line-height: 1.1;
+    white-space: nowrap;
   }
   .hud-val {
-    font-size: 18px;
+    font-size: clamp(13px, 3.6vw, 18px);
     font-weight: 900;
     color: #fff;
     line-height: 1.2;
     margin-top: 2px;
+    white-space: nowrap;
   }
   .hud-val.speed-color { color: #38bdf8; }
   .hud-val.star-color { color: #facc15; }
   .nos-bar-bg {
     width: 100%;
-    height: 8px;
+    height: 7px;
     background: rgba(255,255,255,0.15);
     border-radius: 99px;
     overflow: hidden;
-    margin-top: 5px;
+    margin-top: 4px;
   }
   #nosFill {
     width: 100%;
@@ -116,18 +130,39 @@
     transition: width 0.08s linear;
   }
 
+  /* Menu / Pause Button in Top HUD */
+  .hud-menu-btn {
+    pointer-events: auto;
+    width: clamp(36px, 9.5vw, 46px);
+    border-radius: 10px;
+    background: rgba(30, 41, 59, 0.9);
+    border: 1.5px solid rgba(255, 255, 255, 0.25);
+    color: #fff;
+    font-size: clamp(16px, 4vw, 20px);
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  }
+  .hud-menu-btn:active {
+    transform: scale(0.92);
+    background: #334155;
+  }
+
   /* Banner notification for Göktuğ */
   #goktugToast {
     position: fixed;
-    top: 74px;
+    top: 64px;
     left: 50%;
     transform: translateX(-50%) scale(0.8);
     z-index: 12;
     background: linear-gradient(135deg, #f59e0b, #ef4444);
     color: #fff;
     font-weight: 900;
-    font-size: clamp(16px, 3.5vw, 24px);
-    padding: 8px 22px;
+    font-size: clamp(14px, 3.5vw, 22px);
+    padding: 7px 18px;
     border-radius: 999px;
     border: 2px solid #fef08a;
     box-shadow: 0 8px 25px rgba(245, 158, 11, 0.55);
@@ -141,32 +176,33 @@
     transform: translateX(-50%) scale(1);
   }
 
-  /* Controls Overlay */
+  /* Controls Overlay - Guaranteed fit on narrow phones & tablets */
   #controls {
     position: fixed;
-    bottom: max(12px, env(safe-area-inset-bottom));
-    left: max(12px, env(safe-area-inset-left));
-    right: max(12px, env(safe-area-inset-right));
+    bottom: max(10px, env(safe-area-inset-bottom));
+    left: max(8px, env(safe-area-inset-left));
+    right: max(8px, env(safe-area-inset-right));
     z-index: 10;
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
+    gap: 6px;
     pointer-events: none;
   }
   .ctrl-cluster {
     display: flex;
-    gap: 10px;
+    gap: clamp(5px, 1.4vw, 10px);
     align-items: flex-end;
     pointer-events: auto;
   }
   .btn-steer {
-    width: clamp(66px, 13vw, 88px);
-    height: clamp(66px, 13vw, 88px);
-    border-radius: 20px;
-    background: rgba(15, 23, 42, 0.78);
+    width: clamp(52px, 13.5vw, 86px);
+    height: clamp(56px, 13.5vw, 86px);
+    border-radius: 16px;
+    background: rgba(15, 23, 42, 0.82);
     border: 2px solid rgba(255, 255, 255, 0.28);
     color: #fff;
-    font-size: 30px;
+    font-size: clamp(22px, 5vw, 30px);
     font-weight: 900;
     display: flex;
     align-items: center;
@@ -186,22 +222,23 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     pointer-events: auto;
   }
   #btnTurbo {
-    padding: 10px 18px;
+    padding: clamp(7px, 1.6vw, 10px) clamp(11px, 3vw, 18px);
     border-radius: 999px;
     border: 2px solid #38bdf8;
-    background: linear-gradient(135deg, rgba(2, 132, 199, 0.88), rgba(14, 165, 233, 0.92));
+    background: linear-gradient(135deg, rgba(2, 132, 199, 0.9), rgba(14, 165, 233, 0.95));
     color: #fff;
     font-weight: 900;
-    font-size: clamp(13px, 2.5vw, 16px);
-    letter-spacing: 0.8px;
+    font-size: clamp(11px, 2.7vw, 15px);
+    letter-spacing: 0.5px;
     box-shadow: 0 0 18px rgba(56, 189, 248, 0.65);
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
+    white-space: nowrap;
   }
   #btnTurbo:active, #btnTurbo.pressed {
     transform: scale(0.93);
@@ -210,20 +247,26 @@
   }
   .gear-box {
     display: flex;
-    background: rgba(15, 23, 42, 0.85);
+    background: rgba(15, 23, 42, 0.88);
     border: 2px solid rgba(255, 255, 255, 0.24);
-    border-radius: 14px;
+    border-radius: 12px;
     overflow: hidden;
     backdrop-filter: blur(6px);
   }
   .gear-btn {
-    padding: 8px 16px;
-    font-size: 15px;
+    padding: clamp(6px, 1.5vw, 8px) clamp(8px, 2.2vw, 14px);
+    font-size: clamp(11px, 2.6vw, 14px);
     font-weight: 900;
     color: #94a3b8;
     background: transparent;
     border: none;
     cursor: pointer;
+    line-height: 1.15;
+  }
+  .gear-btn span {
+    display: block;
+    font-size: clamp(8px, 2vw, 10px);
+    font-weight: 700;
   }
   .gear-btn.active-d {
     background: #16a34a;
@@ -236,26 +279,26 @@
     box-shadow: inset 0 0 10px rgba(255,255,255,0.3);
   }
 
-  /* Pedals */
+  /* Pedals - Compact enough so Brake & Gas NEVER overflow narrow screens */
   .pedal-brake {
-    width: clamp(64px, 12vw, 82px);
-    height: clamp(78px, 14vw, 98px);
-    border-radius: 14px 14px 18px 18px;
+    width: clamp(48px, 12.2vw, 80px);
+    height: clamp(66px, 15vw, 96px);
+    border-radius: 12px 12px 16px 16px;
     background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
     border: 2.5px solid #ef4444;
     color: #fca5a5;
     font-weight: 900;
-    font-size: 13px;
+    font-size: clamp(10px, 2.5vw, 13px);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 4px;
+    padding: 6px 2px;
     box-shadow: 0 6px 18px rgba(0,0,0,0.5);
   }
   .pedal-brake .tread {
-    width: 75%;
-    height: 4px;
+    width: 72%;
+    height: 3px;
     background: rgba(239, 68, 68, 0.45);
     border-radius: 2px;
   }
@@ -266,24 +309,24 @@
   }
 
   .pedal-gas {
-    width: clamp(68px, 13vw, 88px);
-    height: clamp(96px, 17vw, 122px);
-    border-radius: 16px 16px 20px 20px;
+    width: clamp(52px, 13.2vw, 86px);
+    height: clamp(82px, 18vw, 120px);
+    border-radius: 14px 14px 18px 18px;
     background: linear-gradient(180deg, #334155 0%, #0f172a 100%);
     border: 2.5px solid #22c55e;
     color: #86efac;
     font-weight: 900;
-    font-size: 14px;
+    font-size: clamp(11px, 2.8vw, 14px);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 4px;
+    padding: 8px 2px;
     box-shadow: 0 6px 20px rgba(0,0,0,0.55);
   }
   .pedal-gas .tread {
-    width: 75%;
-    height: 4px;
+    width: 72%;
+    height: 3px;
     background: rgba(34, 197, 94, 0.45);
     border-radius: 2px;
   }
@@ -293,12 +336,68 @@
     transform: scale(0.94) translateY(4px);
   }
 
-  /* Start Screen Overlay - Strictly fits 100dvh */
+  /* Pause / Exit / Restart Modal */
+  #pauseModal {
+    position: fixed;
+    inset: 0;
+    z-index: 25;
+    background: rgba(5, 8, 17, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    gap: 14px;
+  }
+  #pauseModal.open {
+    display: flex;
+  }
+  .pause-card {
+    background: rgba(15, 23, 42, 0.95);
+    border: 2px solid rgba(56, 189, 248, 0.4);
+    border-radius: 22px;
+    padding: 22px 20px;
+    width: 100%;
+    max-width: 340px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+    box-shadow: 0 12px 35px rgba(0,0,0,0.65);
+  }
+  .pause-title {
+    font-size: 22px;
+    font-weight: 900;
+    color: #facc15;
+    margin-bottom: 4px;
+  }
+  .modal-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 14px;
+    border: none;
+    font-size: 16px;
+    font-weight: 900;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .modal-btn:active { transform: scale(0.96); }
+  .btn-resume  { background: linear-gradient(135deg, #22c55e, #16a34a); }
+  .btn-restart { background: linear-gradient(135deg, #0284c7, #2563eb); }
+  .btn-exit    { background: linear-gradient(135deg, #ef4444, #b91c1c); }
+
+  /* Start Screen Overlay */
   #startScreen {
     position: fixed;
     inset: 0;
     z-index: 30;
-    background: radial-gradient(circle at top, rgba(15, 23, 42, 0.88), rgba(5, 8, 17, 0.96));
+    background: radial-gradient(circle at top, rgba(15, 23, 42, 0.9), rgba(5, 8, 17, 0.97));
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     display: flex;
@@ -389,6 +488,11 @@
     max-width: 480px;
   }
 
+  /* Hide timer on ultra-narrow portrait screens (<390px) so Menu button & HUD fit cleanly */
+  @media (max-width: 390px) {
+    .w-time { display: none; }
+  }
+
   /* Compact landscape mobile adjustment */
   @media (max-height: 520px) {
     #startScreen { gap: 6px; padding-top: 6px; padding-bottom: 6px; }
@@ -400,7 +504,7 @@
   }
 </style>
 </head>
-<body>
+<body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
 
 <canvas id="gameCanvas"></canvas>
 <div id="speedLines"></div>
@@ -409,15 +513,15 @@
 <div id="hudTop">
   <div class="hud-group">
     <div class="hud-box w-speed">
-      <div class="hud-label">HIZ (KM/S)</div>
+      <div class="hud-label">HIZ</div>
       <div class="hud-val speed-color" id="hudSpeed">0</div>
     </div>
     <div class="hud-box w-rpm">
-      <div class="hud-label">DEVİR / VİTES</div>
+      <div class="hud-label">VİTES</div>
       <div class="hud-val" id="hudGear">D1</div>
     </div>
     <div class="hud-box w-nos">
-      <div class="hud-label">TURBO NOS</div>
+      <div class="hud-label">TURBO</div>
       <div class="nos-bar-bg"><div id="nosFill"></div></div>
     </div>
   </div>
@@ -430,6 +534,7 @@
       <div class="hud-label">SÜRE</div>
       <div class="hud-val" id="hudTime">00:00</div>
     </div>
+    <button class="hud-menu-btn" id="btnPause" aria-label="Menü">⏸</button>
   </div>
 </div>
 
@@ -445,8 +550,8 @@
   <div class="center-cluster">
     <button id="btnTurbo">🔥 TURBO</button>
     <div class="gear-box">
-      <button class="gear-btn active-d" id="gearD">D (İLERİ)</button>
-      <button class="gear-btn" id="gearR">R (GERİ)</button>
+      <button class="gear-btn active-d" id="gearD">D<span>İLERİ</span></button>
+      <button class="gear-btn" id="gearR">R<span>GERİ</span></button>
     </div>
   </div>
 
@@ -461,6 +566,16 @@
       <span>GAZ</span>
       <span class="tread"></span>
     </button>
+  </div>
+</div>
+
+<!-- Pause / Restart / Exit Modal -->
+<div id="pauseModal">
+  <div class="pause-card">
+    <div class="pause-title">🏁 YARIŞ DURAKLATILDI</div>
+    <button class="modal-btn btn-resume" id="btnResume">▶ DEVAM ET</button>
+    <button class="modal-btn btn-restart" id="btnRestart">🔄 YENİDEN BAŞLA</button>
+    <button class="modal-btn btn-exit" id="btnExit">🚪 OYUNDAN ÇIK</button>
   </div>
 </div>
 
@@ -499,7 +614,11 @@ if (typeof THREE === 'undefined') {
 
 <script>
 (function() {
-  // Vehicle presets
+  // Prevent iOS Safari long-press text selection / callout / double-tap zoom globally
+  document.addEventListener('selectstart', e => e.preventDefault(), { passive: false });
+  document.addEventListener('contextmenu', e => e.preventDefault(), { passive: false });
+  document.addEventListener('gesturestart', e => e.preventDefault(), { passive: false });
+
   const CARS = [
     { name: 'Kırmızı Şimşek', color: 0xef4444, accent: 0xffffff, maxSpeed: 345, accel: 58 },
     { name: 'Mavi Fırtına',   color: 0x0284c7, accent: 0x38bdf8, maxSpeed: 365, accel: 54 },
@@ -507,7 +626,6 @@ if (typeof THREE === 'undefined') {
   ];
   let selectedCarIdx = 0;
 
-  // Card selection
   document.querySelectorAll('.car-card').forEach(card => {
     card.addEventListener('click', () => {
       document.querySelectorAll('.car-card').forEach(c => c.classList.remove('selected'));
@@ -520,9 +638,28 @@ if (typeof THREE === 'undefined') {
   // Input states
   const input = { left: false, right: false, gas: false, brake: false, turbo: false, gear: 'D' };
 
+  function resetInputs() {
+    input.left = false;
+    input.right = false;
+    input.gas = false;
+    input.brake = false;
+    input.turbo = false;
+    document.querySelectorAll('.pressed').forEach(el => el.classList.remove('pressed'));
+  }
+
   function bindHoldButton(el, key) {
-    const start = (e) => { e.preventDefault(); input[key] = true; el.classList.add('pressed'); };
-    const end   = (e) => { e.preventDefault(); input[key] = false; el.classList.remove('pressed'); };
+    const start = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      input[key] = true;
+      el.classList.add('pressed');
+    };
+    const end = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      input[key] = false;
+      el.classList.remove('pressed');
+    };
     el.addEventListener('touchstart', start, { passive: false });
     el.addEventListener('touchend', end, { passive: false });
     el.addEventListener('touchcancel', end, { passive: false });
@@ -543,10 +680,12 @@ if (typeof THREE === 'undefined') {
     btnGearD.className = 'gear-btn' + (g === 'D' ? ' active-d' : '');
     btnGearR.className = 'gear-btn' + (g === 'R' ? ' active-r' : '');
   }
+  btnGearD.addEventListener('touchstart', (e) => { e.preventDefault(); setGear('D'); }, { passive: false });
+  btnGearR.addEventListener('touchstart', (e) => { e.preventDefault(); setGear('R'); }, { passive: false });
   btnGearD.addEventListener('click', () => setGear('D'));
   btnGearR.addEventListener('click', () => setGear('R'));
 
-  // Keyboard support for desktop testing
+  // Keyboard support
   window.addEventListener('keydown', (e) => {
     if (e.code === 'ArrowLeft' || e.code === 'KeyA') input.left = true;
     if (e.code === 'ArrowRight' || e.code === 'KeyD') input.right = true;
@@ -581,7 +720,16 @@ if (typeof THREE === 'undefined') {
         engineOsc.start();
       }
       if (audioCtx.state === 'suspended') audioCtx.resume();
+      if (engineGain) engineGain.gain.setTargetAtTime(0.04, audioCtx.currentTime, 0.05);
     } catch (err) {}
+  }
+
+  function muteAudio() {
+    try {
+      if (engineGain && audioCtx) {
+        engineGain.gain.setTargetAtTime(0.0001, audioCtx.currentTime, 0.05);
+      }
+    } catch (e) {}
   }
 
   function playStarChime() {
@@ -628,7 +776,6 @@ if (typeof THREE === 'undefined') {
   dirLight.position.set(25, 45, 20);
   scene.add(dirLight);
 
-  // Helper: Create dynamic sign texture
   function makeSignTexture(text, bg, fg, border) {
     const c = document.createElement('canvas');
     c.width = 512; c.height = 128;
@@ -643,33 +790,31 @@ if (typeof THREE === 'undefined') {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(text, 256, 66);
-    const tex = new THREE.CanvasTexture(c);
-    return tex;
+    return new THREE.CanvasTexture(c);
   }
 
   // Road & Environment
   const ROAD_WIDTH = 16;
-  const roadGeo = new THREE.PlaneGeometry(ROAD_WIDTH, 900);
-  const roadMat = new THREE.MeshLambertMaterial({ color: 0x1e293b });
-  const roadMesh = new THREE.Mesh(roadGeo, roadMat);
+  const roadMesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(ROAD_WIDTH, 900),
+    new THREE.MeshLambertMaterial({ color: 0x1e293b })
+  );
   roadMesh.rotation.x = -Math.PI / 2;
   roadMesh.position.z = -350;
   scene.add(roadMesh);
 
-  // Grass shoulders
-  const grassGeo = new THREE.PlaneGeometry(300, 900);
-  const grassMat = new THREE.MeshLambertMaterial({ color: 0x064e3b });
-  const grassMesh = new THREE.Mesh(grassGeo, grassMat);
+  const grassMesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(300, 900),
+    new THREE.MeshLambertMaterial({ color: 0x064e3b })
+  );
   grassMesh.rotation.x = -Math.PI / 2;
   grassMesh.position.set(0, -0.05, -350);
   scene.add(grassMesh);
 
-  // Scrolling road markings, curbs, signs & stars
   const worldObjects = [];
   const stars = [];
   const confettiParticles = [];
 
-  // Dashed lane lines & red/white curbs
   const dashGeo = new THREE.PlaneGeometry(0.32, 4.5);
   const dashMat = new THREE.MeshBasicMaterial({ color: 0xf8fafc });
   const curbGeo = new THREE.BoxGeometry(0.7, 0.25, 6);
@@ -694,7 +839,7 @@ if (typeof THREE === 'undefined') {
     worldObjects.push(cL, cR);
   }
 
-  // Göktuğ Champion Banners & Trackside Billboards
+  // Göktuğ Champion Banners
   const bannerTexts = [
     { txt: '🏆 GÖKTUĞ ŞAMPİYON! 🏆', bg: '#0f172a', fg: '#facc15', border: '#38bdf8' },
     { txt: '⚡ HARİKASIN GÖKTUĞ! ⚡', bg: '#1d4ed8', fg: '#ffffff', border: '#facc15' },
@@ -706,7 +851,6 @@ if (typeof THREE === 'undefined') {
     const info = bannerTexts[i % bannerTexts.length];
     const tex = makeSignTexture(info.txt, info.bg, info.fg, info.border);
 
-    // Overhead Arch
     const archGroup = new THREE.Group();
     const postGeo = new THREE.BoxGeometry(0.6, 7.5, 0.6);
     const postMat = new THREE.MeshLambertMaterial({ color: 0x334155 });
@@ -722,7 +866,6 @@ if (typeof THREE === 'undefined') {
     scene.add(archGroup);
     worldObjects.push(archGroup);
 
-    // Roadside Göktuğ #1 signs
     const sideTex = makeSignTexture('GÖKTUĞ #1 ⭐', '#0284c7', '#ffffff', '#facc15');
     const sideSign = new THREE.Mesh(
       new THREE.BoxGeometry(4.2, 1.5, 0.3),
@@ -745,7 +888,7 @@ if (typeof THREE === 'undefined') {
     stars.push(s);
   }
 
-  // Build Player Car with "GÖKTUĞ 01" License Plate & Flame Exhausts
+  // Build Player Car
   let bodyMat, brakeLightMat, reverseLightMat, flameL, flameR;
   function buildPlayerCar() {
     const car = new THREE.Group();
@@ -760,18 +903,15 @@ if (typeof THREE === 'undefined') {
     cabin.position.set(0, 1.25, -0.15);
     car.add(cabin);
 
-    // Rear Spoiler
     const wing = new THREE.Mesh(new THREE.BoxGeometry(2.15, 0.12, 0.45), new THREE.MeshLambertMaterial({ color: 0x1e293b }));
     wing.position.set(0, 1.35, 1.95);
     car.add(wing);
 
-    // License Plate "GÖKTUĞ 01"
     const plateTex = makeSignTexture('GÖKTUĞ 01', '#ffffff', '#0f172a', '#2563eb');
     const plate = new THREE.Mesh(new THREE.PlaneGeometry(1.05, 0.28), new THREE.MeshBasicMaterial({ map: plateTex }));
     plate.position.set(0, 0.56, 2.21);
     car.add(plate);
 
-    // Brake & Reverse Lights
     brakeLightMat = new THREE.MeshBasicMaterial({ color: 0x7f1d1d });
     const tailL = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.18, 0.08), brakeLightMat);
     tailL.position.set(-0.72, 0.78, 2.21);
@@ -786,7 +926,6 @@ if (typeof THREE === 'undefined') {
     revR.position.x = 0.42;
     car.add(revL, revR);
 
-    // Turbo Exhaust Flames
     const flameGeo = new THREE.ConeGeometry(0.22, 1.4, 8);
     flameGeo.rotateX(Math.PI / 2);
     const flameMat = new THREE.MeshBasicMaterial({ color: 0x00f2fe });
@@ -797,7 +936,6 @@ if (typeof THREE === 'undefined') {
     flameR.position.x = 0.55;
     car.add(flameL, flameR);
 
-    // Wheels
     const wheelGeo = new THREE.CylinderGeometry(0.42, 0.42, 0.32, 16);
     wheelGeo.rotateZ(Math.PI / 2);
     const wheelMat = new THREE.MeshLambertMaterial({ color: 0x111827 });
@@ -839,7 +977,6 @@ if (typeof THREE === 'undefined') {
     trafficCars.push(tc);
   }
 
-  // Confetti burst when collecting a star
   function spawnConfetti(x, y, z) {
     const colors = [0xfacc15, 0x38bdf8, 0xf43f5e, 0x4ade80];
     for (let i = 0; i < 24; i++) {
@@ -859,7 +996,6 @@ if (typeof THREE === 'undefined') {
     }
   }
 
-  // Toast helper
   let toastTimer = null;
   const toastEl = document.getElementById('goktugToast');
   function showToast(msg) {
@@ -871,6 +1007,7 @@ if (typeof THREE === 'undefined') {
 
   // Game State
   let gameStarted = false;
+  let gamePaused = false;
   let speedKmh = 0;
   let nosEnergy = 100;
   let starCount = 0;
@@ -882,13 +1019,85 @@ if (typeof THREE === 'undefined') {
   const hudStars = document.getElementById('hudStars');
   const hudTime  = document.getElementById('hudTime');
   const speedLinesEl = document.getElementById('speedLines');
+  const pauseModal = document.getElementById('pauseModal');
+  const startScreen = document.getElementById('startScreen');
 
+  function resetRaceState() {
+    resetInputs();
+    setGear('D');
+    speedKmh = 0;
+    nosEnergy = 100;
+    starCount = 0;
+    elapsedSec = 0;
+    playerCar.position.set(0, 0, 0);
+    playerCar.rotation.set(0, 0, 0);
+    camera.position.set(0, 3.6, 7.5);
+    camera.fov = 62;
+    camera.updateProjectionMatrix();
+    flameL.visible = false;
+    flameR.visible = false;
+    speedLinesEl.classList.remove('active');
+
+    for (let i = 0; i < trafficCars.length; i++) {
+      trafficCars[i].position.set((i - 2) * 2.8, 0, -90 - i * 110);
+    }
+    for (let i = 0; i < stars.length; i++) {
+      stars[i].position.set((Math.random() - 0.5) * (ROAD_WIDTH - 3.5), 1.1, -45 - i * 52);
+    }
+
+    hudSpeed.textContent = '0';
+    hudGear.textContent = 'D1';
+    nosFill.style.width = '100%';
+    hudStars.textContent = '0 ⭐';
+    hudTime.textContent = '00:00';
+  }
+
+  // Start Race
   document.getElementById('btnStart').addEventListener('click', () => {
     initAudio();
     updateCarPaint(CARS[selectedCarIdx]);
-    document.getElementById('startScreen').style.display = 'none';
+    resetRaceState();
+    startScreen.style.display = 'none';
+    pauseModal.classList.remove('open');
+    gamePaused = false;
     gameStarted = true;
     showToast('🏁 HADİ GÖKTUĞ, ŞAMPİYONLUK SENİN! 🏆');
+  });
+
+  // Pause / Menu Button
+  document.getElementById('btnPause').addEventListener('click', () => {
+    if (!gameStarted) return;
+    gamePaused = true;
+    resetInputs();
+    muteAudio();
+    pauseModal.classList.add('open');
+  });
+
+  // Resume Race
+  document.getElementById('btnResume').addEventListener('click', () => {
+    pauseModal.classList.remove('open');
+    gamePaused = false;
+    initAudio();
+  });
+
+  // Restart Race
+  document.getElementById('btnRestart').addEventListener('click', () => {
+    pauseModal.classList.remove('open');
+    resetRaceState();
+    gamePaused = false;
+    gameStarted = true;
+    initAudio();
+    showToast('🔄 YENİDEN BAŞLADI, BAŞARILAR GÖKTUĞ!');
+  });
+
+  // Exit to Main Menu
+  document.getElementById('btnExit').addEventListener('click', () => {
+    pauseModal.classList.remove('open');
+    resetRaceState();
+    gamePaused = false;
+    gameStarted = false;
+    muteAudio();
+    startScreen.style.display = 'flex';
   });
 
   // Main Game Loop
@@ -900,10 +1109,9 @@ if (typeof THREE === 'undefined') {
 
     const carSpec = CARS[selectedCarIdx];
 
-    if (gameStarted) {
+    if (gameStarted && !gamePaused) {
       elapsedSec += dt;
 
-      // Turbo logic
       const turboActive = input.turbo && nosEnergy > 2 && input.gear === 'D' && speedKmh > 25;
       if (turboActive) {
         nosEnergy = Math.max(0, nosEnergy - 28 * dt);
@@ -922,7 +1130,6 @@ if (typeof THREE === 'undefined') {
       }
       camera.updateProjectionMatrix();
 
-      // Acceleration / Braking / Gear D & R
       const topSpeed = turboActive ? carSpec.maxSpeed : carSpec.maxSpeed * 0.72;
       const accelRate = turboActive ? carSpec.accel * 1.85 : carSpec.accel;
 
@@ -942,7 +1149,6 @@ if (typeof THREE === 'undefined') {
             speedKmh = Math.max(0, speedKmh - 26 * dt);
           }
         } else {
-          // Reverse gear R
           reverseLightMat.color.setHex(0xffffff);
           if (speedKmh > 0) {
             speedKmh = Math.max(0, speedKmh - 120 * dt);
@@ -954,7 +1160,6 @@ if (typeof THREE === 'undefined') {
         }
       }
 
-      // Steering
       const steerDir = (input.left ? -1 : 0) + (input.right ? 1 : 0);
       const speedFactor = Math.min(1, Math.abs(speedKmh) / 35);
       const reverseInvert = speedKmh < -1 ? -1 : 1;
@@ -963,10 +1168,8 @@ if (typeof THREE === 'undefined') {
       playerCar.rotation.y = -steerDir * 0.08 * speedFactor * reverseInvert;
       playerCar.rotation.z = steerDir * 0.035 * speedFactor;
 
-      // World movement speed
       const worldMove = (speedKmh * 0.42) * dt;
 
-      // Recycle track objects
       for (let i = 0; i < worldObjects.length; i++) {
         const obj = worldObjects[i];
         obj.position.z += worldMove;
@@ -974,7 +1177,6 @@ if (typeof THREE === 'undefined') {
         if (obj.position.z < -760) obj.position.z += 780;
       }
 
-      // Stars rotation & pickup
       for (let i = 0; i < stars.length; i++) {
         const s = stars[i];
         s.rotation.y += 3.2 * dt;
@@ -996,7 +1198,6 @@ if (typeof THREE === 'undefined') {
         }
       }
 
-      // Traffic cars AI & gentle bounce collision
       for (let i = 0; i < trafficCars.length; i++) {
         const tc = trafficCars[i];
         tc.position.z += (worldMove - tc.userData.speed * 0.42 * dt);
@@ -1015,7 +1216,6 @@ if (typeof THREE === 'undefined') {
         }
       }
 
-      // Confetti animation
       for (let i = confettiParticles.length - 1; i >= 0; i--) {
         const p = confettiParticles[i];
         p.position.x += p.userData.vx * dt;
@@ -1031,10 +1231,8 @@ if (typeof THREE === 'undefined') {
         }
       }
 
-      // Camera smooth follow
       camera.position.x += (playerCar.position.x * 0.72 - camera.position.x) * 7 * dt;
 
-      // Audio pitch
       if (engineOsc && audioCtx) {
         const absSpd = Math.abs(speedKmh);
         const gearIdx = Math.min(6, Math.max(1, Math.floor(absSpd / 55) + 1));
@@ -1043,15 +1241,13 @@ if (typeof THREE === 'undefined') {
         hudGear.textContent = input.gear === 'R' ? 'R' : ('D' + gearIdx);
       }
 
-      // Update Fixed HUD
       hudSpeed.textContent = Math.round(Math.abs(speedKmh));
       nosFill.style.width = nosEnergy.toFixed(0) + '%';
       hudStars.textContent = starCount + ' ⭐';
       const mins = String(Math.floor(elapsedSec / 60)).padStart(2, '0');
       const secs = String(Math.floor(elapsedSec % 60)).padStart(2, '0');
       hudTime.textContent = mins + ':' + secs;
-    } else {
-      // Idle showcase camera rotation before start
+    } else if (!gameStarted) {
       playerCar.rotation.y = Math.sin(now * 0.0012) * 0.25;
     }
 
