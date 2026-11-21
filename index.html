@@ -56,7 +56,7 @@
     opacity: 1;
   }
 
-  /* Top Fixed HUD - Adaptive for narrow portrait & wide landscape */
+  /* Top Fixed HUD */
   #hudTop {
     position: fixed;
     top: max(8px, env(safe-area-inset-top));
@@ -89,14 +89,14 @@
     flex-direction: column;
     justify-content: center;
   }
-  .w-speed { width: clamp(58px, 16vw, 88px); }
-  .w-rpm   { width: clamp(56px, 15vw, 84px); }
-  .w-nos   { width: clamp(66px, 18vw, 105px); }
-  .w-stars { width: clamp(54px, 14vw, 78px); }
-  .w-time  { width: clamp(58px, 15vw, 86px); }
+  .w-speed { width: clamp(54px, 14vw, 82px); }
+  .w-level { width: clamp(56px, 14.5vw, 84px); }
+  .w-nos   { width: clamp(62px, 16vw, 98px); }
+  .w-stars { width: clamp(52px, 13.5vw, 76px); }
+  .w-time  { width: clamp(54px, 14vw, 82px); }
 
   .hud-label {
-    font-size: clamp(8px, 2.1vw, 10px);
+    font-size: clamp(8px, 2vw, 10px);
     font-weight: 700;
     letter-spacing: 0.4px;
     color: #94a3b8;
@@ -105,7 +105,7 @@
     white-space: nowrap;
   }
   .hud-val {
-    font-size: clamp(13px, 3.6vw, 18px);
+    font-size: clamp(13px, 3.4vw, 18px);
     font-weight: 900;
     color: #fff;
     line-height: 1.2;
@@ -113,7 +113,10 @@
     white-space: nowrap;
   }
   .hud-val.speed-color { color: #38bdf8; }
-  .hud-val.star-color { color: #facc15; }
+  .hud-val.star-color  { color: #facc15; }
+  .hud-val.level-color { color: #c084fc; }
+  .hud-val.time-urgent { color: #f87171 !important; }
+
   .nos-bar-bg {
     width: 100%;
     height: 7px;
@@ -130,15 +133,14 @@
     transition: width 0.08s linear;
   }
 
-  /* Menu / Pause Button in Top HUD */
   .hud-menu-btn {
     pointer-events: auto;
-    width: clamp(36px, 9.5vw, 46px);
+    width: clamp(34px, 9vw, 44px);
     border-radius: 10px;
     background: rgba(30, 41, 59, 0.9);
     border: 1.5px solid rgba(255, 255, 255, 0.25);
     color: #fff;
-    font-size: clamp(16px, 4vw, 20px);
+    font-size: clamp(15px, 3.8vw, 20px);
     font-weight: 900;
     display: flex;
     align-items: center;
@@ -151,18 +153,40 @@
     background: #334155;
   }
 
+  /* Camera Mode Pill under top-right */
+  #camBadge {
+    position: fixed;
+    top: calc(max(8px, env(safe-area-inset-top)) + 54px);
+    right: max(8px, env(safe-area-inset-right));
+    z-index: 10;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1.5px solid rgba(56, 189, 248, 0.45);
+    color: #e2e8f0;
+    font-size: clamp(10px, 2.4vw, 12px);
+    font-weight: 800;
+    padding: 5px 10px;
+    border-radius: 999px;
+    pointer-events: auto;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+  }
+  #camBadge:active {
+    transform: scale(0.94);
+    border-color: #38bdf8;
+  }
+
   /* Banner notification for Göktuğ */
   #goktugToast {
     position: fixed;
-    top: 64px;
+    top: calc(max(8px, env(safe-area-inset-top)) + 56px);
     left: 50%;
     transform: translateX(-50%) scale(0.8);
     z-index: 12;
     background: linear-gradient(135deg, #f59e0b, #ef4444);
     color: #fff;
     font-weight: 900;
-    font-size: clamp(14px, 3.5vw, 22px);
-    padding: 7px 18px;
+    font-size: clamp(13px, 3.2vw, 20px);
+    padding: 6px 16px;
     border-radius: 999px;
     border: 2px solid #fef08a;
     box-shadow: 0 8px 25px rgba(245, 158, 11, 0.55);
@@ -176,7 +200,7 @@
     transform: translateX(-50%) scale(1);
   }
 
-  /* Controls Overlay - Guaranteed fit on narrow phones & tablets */
+  /* Controls Overlay */
   #controls {
     position: fixed;
     bottom: max(10px, env(safe-area-inset-bottom));
@@ -188,6 +212,13 @@
     align-items: flex-end;
     gap: 6px;
     pointer-events: none;
+  }
+  .left-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    pointer-events: auto;
   }
   .ctrl-cluster {
     display: flex;
@@ -217,33 +248,33 @@
     transform: scale(0.94);
   }
 
-  /* Center Gear + Turbo */
-  .center-cluster {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    pointer-events: auto;
-  }
+  /* Easy-access Turbo button right above steering & easy thumb reach */
   #btnTurbo {
-    padding: clamp(7px, 1.6vw, 10px) clamp(11px, 3vw, 18px);
-    border-radius: 999px;
-    border: 2px solid #38bdf8;
-    background: linear-gradient(135deg, rgba(2, 132, 199, 0.9), rgba(14, 165, 233, 0.95));
+    padding: clamp(9px, 2vw, 13px) clamp(14px, 3.6vw, 22px);
+    border-radius: 16px;
+    border: 2px solid #7dd3fc;
+    background: linear-gradient(135deg, #0284c7, #0ea5e9);
     color: #fff;
     font-weight: 900;
-    font-size: clamp(11px, 2.7vw, 15px);
-    letter-spacing: 0.5px;
-    box-shadow: 0 0 18px rgba(56, 189, 248, 0.65);
+    font-size: clamp(12px, 3vw, 16px);
+    letter-spacing: 0.6px;
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.7);
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
     white-space: nowrap;
   }
   #btnTurbo:active, #btnTurbo.pressed {
-    transform: scale(0.93);
-    background: linear-gradient(135deg, #00f2fe, #4facfe);
-    box-shadow: 0 0 28px #00f2fe;
+    transform: scale(0.94);
+    background: linear-gradient(135deg, #00f2fe, #38bdf8);
+    box-shadow: 0 0 30px #00f2fe;
+  }
+
+  .center-gear {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: auto;
   }
   .gear-box {
     display: flex;
@@ -279,7 +310,7 @@
     box-shadow: inset 0 0 10px rgba(255,255,255,0.3);
   }
 
-  /* Pedals - Compact enough so Brake & Gas NEVER overflow narrow screens */
+  /* Pedals */
   .pedal-brake {
     width: clamp(48px, 12.2vw, 80px);
     height: clamp(66px, 15vw, 96px);
@@ -336,12 +367,12 @@
     transform: scale(0.94) translateY(4px);
   }
 
-  /* Pause / Exit / Restart Modal */
-  #pauseModal {
+  /* Pause / Level Complete / Time Up Modal */
+  .overlay-modal {
     position: fixed;
     inset: 0;
     z-index: 25;
-    background: rgba(5, 8, 17, 0.85);
+    background: rgba(5, 8, 17, 0.86);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     display: none;
@@ -351,34 +382,39 @@
     padding: 20px;
     gap: 14px;
   }
-  #pauseModal.open {
+  .overlay-modal.open {
     display: flex;
   }
-  .pause-card {
-    background: rgba(15, 23, 42, 0.95);
-    border: 2px solid rgba(56, 189, 248, 0.4);
+  .modal-card {
+    background: rgba(15, 23, 42, 0.96);
+    border: 2px solid rgba(56, 189, 248, 0.45);
     border-radius: 22px;
     padding: 22px 20px;
     width: 100%;
-    max-width: 340px;
+    max-width: 350px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 11px;
     text-align: center;
     box-shadow: 0 12px 35px rgba(0,0,0,0.65);
   }
-  .pause-title {
+  .modal-title {
     font-size: 22px;
     font-weight: 900;
     color: #facc15;
+  }
+  .modal-sub {
+    font-size: 14px;
+    color: #cbd5e1;
+    line-height: 1.4;
     margin-bottom: 4px;
   }
   .modal-btn {
     width: 100%;
-    padding: 14px;
+    padding: 13px;
     border-radius: 14px;
     border: none;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 900;
     color: #fff;
     cursor: pointer;
@@ -406,100 +442,91 @@
     justify-content: center;
     padding: max(12px, env(safe-area-inset-top)) 16px max(12px, env(safe-area-inset-bottom));
     text-align: center;
-    gap: clamp(8px, 2vh, 18px);
+    gap: clamp(8px, 1.8vh, 14px);
   }
   .badge-champ {
     background: linear-gradient(90deg, #f59e0b, #eab308);
     color: #0f172a;
     font-weight: 900;
-    font-size: clamp(11px, 2.2vw, 14px);
+    font-size: clamp(10px, 2.1vw, 13px);
     padding: 4px 14px;
     border-radius: 999px;
     letter-spacing: 1px;
     text-transform: uppercase;
   }
   .game-title {
-    font-size: clamp(24px, 5.5vw, 44px);
+    font-size: clamp(22px, 5vw, 40px);
     font-weight: 900;
     line-height: 1.08;
     background: linear-gradient(180deg, #ffffff 20%, #38bdf8 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 4px 24px rgba(56, 189, 248, 0.35);
   }
   .car-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: clamp(8px, 2vw, 14px);
+    gap: clamp(6px, 1.8vw, 12px);
     width: 100%;
-    max-width: 560px;
+    max-width: 540px;
   }
   .car-card {
     background: rgba(30, 41, 59, 0.78);
     border: 2px solid rgba(255, 255, 255, 0.16);
-    border-radius: 16px;
-    padding: clamp(8px, 1.8vh, 14px) 8px;
+    border-radius: 14px;
+    padding: clamp(7px, 1.5vh, 12px) 6px;
     cursor: pointer;
     transition: all 0.18s ease;
   }
   .car-card.selected {
     border-color: #38bdf8;
     background: rgba(14, 165, 233, 0.22);
-    box-shadow: 0 0 20px rgba(56, 189, 248, 0.45);
+    box-shadow: 0 0 18px rgba(56, 189, 248, 0.45);
     transform: translateY(-2px);
   }
   .car-dot {
-    width: clamp(26px, 4.5vw, 38px);
-    height: clamp(26px, 4.5vw, 38px);
+    width: clamp(24px, 4vw, 34px);
+    height: clamp(24px, 4vw, 34px);
     border-radius: 50%;
-    margin: 0 auto 6px;
+    margin: 0 auto 5px;
     border: 3px solid #fff;
   }
   .car-name {
     font-weight: 800;
-    font-size: clamp(12px, 2.4vw, 15px);
+    font-size: clamp(11px, 2.2vw, 14px);
     color: #fff;
   }
   .car-stat {
-    font-size: clamp(10px, 1.9vw, 12px);
+    font-size: clamp(9px, 1.8vw, 11px);
     color: #94a3b8;
     margin-top: 2px;
   }
   #btnStart {
     width: 100%;
     max-width: 340px;
-    padding: clamp(12px, 2.2vh, 16px) 24px;
+    padding: clamp(11px, 2vh, 15px) 24px;
     border-radius: 16px;
     border: none;
     background: linear-gradient(135deg, #22c55e, #16a34a);
     color: #fff;
-    font-size: clamp(17px, 3.2vw, 22px);
+    font-size: clamp(16px, 3vw, 21px);
     font-weight: 900;
     letter-spacing: 1px;
     box-shadow: 0 8px 25px rgba(34, 197, 94, 0.5);
     cursor: pointer;
   }
-  #btnStart:active {
-    transform: scale(0.96);
-  }
+  #btnStart:active { transform: scale(0.96); }
   .hint-text {
-    font-size: clamp(11px, 2vw, 13px);
+    font-size: clamp(10px, 1.9vw, 12px);
     color: #94a3b8;
     max-width: 480px;
   }
 
-  /* Hide timer on ultra-narrow portrait screens (<390px) so Menu button & HUD fit cleanly */
-  @media (max-width: 390px) {
-    .w-time { display: none; }
-  }
-
-  /* Compact landscape mobile adjustment */
   @media (max-height: 520px) {
-    #startScreen { gap: 6px; padding-top: 6px; padding-bottom: 6px; }
-    .game-title { font-size: 22px; }
-    .car-card { padding: 6px; }
-    .car-dot { width: 22px; height: 22px; margin-bottom: 3px; }
-    #btnStart { padding: 10px 20px; font-size: 16px; }
+    #startScreen { gap: 5px; padding-top: 5px; padding-bottom: 5px; }
+    .game-title { font-size: 20px; }
+    .car-card { padding: 5px; }
+    .car-dot { width: 20px; height: 20px; margin-bottom: 2px; }
+    #btnStart { padding: 9px 18px; font-size: 15px; }
     .hint-text { display: none; }
   }
 </style>
@@ -516,9 +543,9 @@
       <div class="hud-label">HIZ</div>
       <div class="hud-val speed-color" id="hudSpeed">0</div>
     </div>
-    <div class="hud-box w-rpm">
-      <div class="hud-label">VİTES</div>
-      <div class="hud-val" id="hudGear">D1</div>
+    <div class="hud-box w-level">
+      <div class="hud-label">BÖLÜM</div>
+      <div class="hud-val level-color" id="hudLevel">1/4</div>
     </div>
     <div class="hud-box w-nos">
       <div class="hud-label">TURBO</div>
@@ -528,27 +555,32 @@
   <div class="hud-group">
     <div class="hud-box w-stars">
       <div class="hud-label">YILDIZ</div>
-      <div class="hud-val star-color" id="hudStars">0 ⭐</div>
+      <div class="hud-val star-color" id="hudStars">0/5</div>
     </div>
     <div class="hud-box w-time">
       <div class="hud-label">SÜRE</div>
-      <div class="hud-val" id="hudTime">00:00</div>
+      <div class="hud-val" id="hudTime">45s</div>
     </div>
     <button class="hud-menu-btn" id="btnPause" aria-label="Menü">⏸</button>
   </div>
 </div>
 
+<!-- Camera Angle Switcher -->
+<button id="camBadge" aria-label="Kamera Açısı">📷 TAKİP</button>
+
 <div id="goktugToast">⚡ SÜPERSİN GÖKTUĞ! ⭐</div>
 
 <!-- Touch Controls -->
 <div id="controls">
-  <div class="ctrl-cluster">
-    <button class="btn-steer" id="btnLeft" aria-label="Sol">◀</button>
-    <button class="btn-steer" id="btnRight" aria-label="Sağ">▶</button>
+  <div class="left-zone">
+    <button id="btnTurbo">🔥 TURBO</button>
+    <div class="ctrl-cluster">
+      <button class="btn-steer" id="btnLeft" aria-label="Sol">◀</button>
+      <button class="btn-steer" id="btnRight" aria-label="Sağ">▶</button>
+    </div>
   </div>
 
-  <div class="center-cluster">
-    <button id="btnTurbo">🔥 TURBO</button>
+  <div class="center-gear">
     <div class="gear-box">
       <button class="gear-btn active-d" id="gearD">D<span>İLERİ</span></button>
       <button class="gear-btn" id="gearR">R<span>GERİ</span></button>
@@ -570,18 +602,30 @@
 </div>
 
 <!-- Pause / Restart / Exit Modal -->
-<div id="pauseModal">
-  <div class="pause-card">
-    <div class="pause-title">🏁 YARIŞ DURAKLATILDI</div>
+<div class="overlay-modal" id="pauseModal">
+  <div class="modal-card">
+    <div class="modal-title">🏁 YARIŞ DURAKLATILDI</div>
+    <div class="modal-sub" id="pauseMapInfo">Harita: Gece Neon Şehri</div>
     <button class="modal-btn btn-resume" id="btnResume">▶ DEVAM ET</button>
-    <button class="modal-btn btn-restart" id="btnRestart">🔄 YENİDEN BAŞLA</button>
+    <button class="modal-btn btn-restart" id="btnRestart">🔄 BÖLÜMÜ YENİDEN BAŞLAT</button>
     <button class="modal-btn btn-exit" id="btnExit">🚪 OYUNDAN ÇIK</button>
+  </div>
+</div>
+
+<!-- Level / Race Outcome Modal -->
+<div class="overlay-modal" id="endModal">
+  <div class="modal-card">
+    <div class="modal-title" id="endTitle">🏆 BÖLÜM TAMAMLANDI!</div>
+    <div class="modal-sub" id="endDesc">Harika sürdün Göktuğ!</div>
+    <button class="modal-btn btn-resume" id="btnNextAction">➡ SONRAKİ BÖLÜM</button>
+    <button class="modal-btn btn-restart" id="btnRetryLevel">🔄 TEKRAR DENE</button>
+    <button class="modal-btn btn-exit" id="btnEndExit">🚪 ANA MENÜ</button>
   </div>
 </div>
 
 <!-- Start Menu -->
 <div id="startScreen">
-  <div class="badge-champ">🏆 GÖKTUĞ ŞAMPİYONLAR PİSTİ 🏆</div>
+  <div class="badge-champ">🏆 GÖKTUĞ 4 BÖLÜMLÜ ŞAMPİYONA 🏆</div>
   <div class="game-title">GÖKTUĞ 3D<br>TURBO YARIŞ</div>
   <div class="car-grid" id="carGrid">
     <div class="car-card selected" data-car="0">
@@ -600,8 +644,8 @@
       <div class="car-stat">335 KM/S • Hızlı Kalkış</div>
     </div>
   </div>
-  <button id="btnStart">🏁 YARIŞA BAŞLA</button>
-  <div class="hint-text">Gaz & Fren pedallarını kullan, yıldızları topla ve 🔥 TURBO ile uç!</div>
+  <button id="btnStart">🏁 1. BÖLÜME BAŞLA</button>
+  <div class="hint-text">Her bölümde yıldızları topla, süre bitmeden hedefi geç ve yeni haritalara uç!</div>
 </div>
 
 <!-- Three.js Primary + Fallback CDN -->
@@ -614,17 +658,51 @@ if (typeof THREE === 'undefined') {
 
 <script>
 (function() {
-  // Prevent iOS Safari long-press text selection / callout / double-tap zoom globally
   document.addEventListener('selectstart', e => e.preventDefault(), { passive: false });
   document.addEventListener('contextmenu', e => e.preventDefault(), { passive: false });
   document.addEventListener('gesturestart', e => e.preventDefault(), { passive: false });
 
   const CARS = [
-    { name: 'Kırmızı Şimşek', color: 0xef4444, accent: 0xffffff, maxSpeed: 345, accel: 58 },
-    { name: 'Mavi Fırtına',   color: 0x0284c7, accent: 0x38bdf8, maxSpeed: 365, accel: 54 },
-    { name: 'Altın Aslan',    color: 0xeab308, accent: 0x1e293b, maxSpeed: 335, accel: 66 }
+    { name: 'Kırmızı Şimşek', color: 0xef4444, maxSpeed: 345, accel: 58 },
+    { name: 'Mavi Fırtına',   color: 0x0284c7, maxSpeed: 365, accel: 54 },
+    { name: 'Altın Aslan',    color: 0xeab308, maxSpeed: 335, accel: 66 }
   ];
+
+  // 4 Distinct Stages / Maps with time limits & star targets
+  const LEVELS = [
+    {
+      name: 'BÖLÜM 1: NEON GECE PİSTİ',
+      sky: 0x0b132b, fog: 0x0b132b, road: 0x1e293b, grass: 0x064e3b,
+      pillar: 0x38bdf8, timeLimit: 45, targetStars: 5, trafficSpeed: 70
+    },
+    {
+      name: 'BÖLÜM 2: GÜNDÜZ ÇÖL OTOBANI',
+      sky: 0x38bdf8, fog: 0x7dd3fc, road: 0x334155, grass: 0xd97706,
+      pillar: 0xfacc15, timeLimit: 42, targetStars: 6, trafficSpeed: 85
+    },
+    {
+      name: 'BÖLÜM 3: MOR GALAKSİ PİSTİ',
+      sky: 0x1e1b4b, fog: 0x312e81, road: 0x1e1b4b, grass: 0x4c1d95,
+      pillar: 0xf472b6, timeLimit: 40, targetStars: 7, trafficSpeed: 98
+    },
+    {
+      name: 'BÖLÜM 4: KIZIL GÜNBATIMI ŞAMPİYONU',
+      sky: 0x451a03, fog: 0x7c2d12, road: 0x1c1917, grass: 0x7f1d1d,
+      pillar: 0xfb923c, timeLimit: 38, targetStars: 8, trafficSpeed: 112
+    }
+  ];
+
+  // Camera modes restored & enhanced for tablet/phone
+  const CAM_MODES = [
+    { id: 'follow',  label: '📷 TAKİP',   x: 0,    y: 3.6,  z: 7.5,  lookY: 1.1, lookZ: -12 },
+    { id: 'far',     label: '🚁 GENİŞ',   x: 0,    y: 6.4,  z: 11.2, lookY: 0.8, lookZ: -16 },
+    { id: 'hood',    label: '🏎️ KAPUT',   x: 0,    y: 1.55, z: 1.2,  lookY: 1.0, lookZ: -22 },
+    { id: 'dynamic', label: '⚡ SÜRÜŞ',   x: 0,    y: 3.1,  z: 6.6,  lookY: 1.3, lookZ: -14 }
+  ];
+  let camModeIdx = 0;
+
   let selectedCarIdx = 0;
+  let currentLevelIdx = 0;
 
   document.querySelectorAll('.car-card').forEach(card => {
     card.addEventListener('click', () => {
@@ -635,31 +713,24 @@ if (typeof THREE === 'undefined') {
     });
   });
 
-  // Input states
-  const input = { left: false, right: false, gas: false, brake: false, turbo: false, gear: 'D' };
+  const camBadge = document.getElementById('camBadge');
+  camBadge.addEventListener('click', (e) => {
+    e.stopPropagation();
+    camModeIdx = (camModeIdx + 1) % CAM_MODES.length;
+    camBadge.textContent = CAM_MODES[camModeIdx].label;
+    showToast('📷 Kamera: ' + CAM_MODES[camModeIdx].label);
+  });
 
+  // Inputs
+  const input = { left: false, right: false, gas: false, brake: false, turbo: false, gear: 'D' };
   function resetInputs() {
-    input.left = false;
-    input.right = false;
-    input.gas = false;
-    input.brake = false;
-    input.turbo = false;
+    input.left = false; input.right = false; input.gas = false; input.brake = false; input.turbo = false;
     document.querySelectorAll('.pressed').forEach(el => el.classList.remove('pressed'));
   }
 
   function bindHoldButton(el, key) {
-    const start = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      input[key] = true;
-      el.classList.add('pressed');
-    };
-    const end = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      input[key] = false;
-      el.classList.remove('pressed');
-    };
+    const start = (e) => { e.preventDefault(); e.stopPropagation(); input[key] = true; el.classList.add('pressed'); };
+    const end   = (e) => { e.preventDefault(); e.stopPropagation(); input[key] = false; el.classList.remove('pressed'); };
     el.addEventListener('touchstart', start, { passive: false });
     el.addEventListener('touchend', end, { passive: false });
     el.addEventListener('touchcancel', end, { passive: false });
@@ -685,13 +756,16 @@ if (typeof THREE === 'undefined') {
   btnGearD.addEventListener('click', () => setGear('D'));
   btnGearR.addEventListener('click', () => setGear('R'));
 
-  // Keyboard support
   window.addEventListener('keydown', (e) => {
     if (e.code === 'ArrowLeft' || e.code === 'KeyA') input.left = true;
     if (e.code === 'ArrowRight' || e.code === 'KeyD') input.right = true;
     if (e.code === 'ArrowUp' || e.code === 'KeyW') input.gas = true;
     if (e.code === 'ArrowDown' || e.code === 'KeyS') input.brake = true;
     if (e.code === 'Space' || e.code === 'ShiftLeft') input.turbo = true;
+    if (e.code === 'KeyC') {
+      camModeIdx = (camModeIdx + 1) % CAM_MODES.length;
+      camBadge.textContent = CAM_MODES[camModeIdx].label;
+    }
     if (e.code === 'KeyR') setGear(input.gear === 'D' ? 'R' : 'D');
   });
   window.addEventListener('keyup', (e) => {
@@ -702,7 +776,7 @@ if (typeof THREE === 'undefined') {
     if (e.code === 'Space' || e.code === 'ShiftLeft') input.turbo = false;
   });
 
-  // Web Audio Engine Sound
+  // Web Audio
   let audioCtx = null, engineOsc = null, engineGain = null;
   function initAudio() {
     try {
@@ -721,17 +795,13 @@ if (typeof THREE === 'undefined') {
       }
       if (audioCtx.state === 'suspended') audioCtx.resume();
       if (engineGain) engineGain.gain.setTargetAtTime(0.04, audioCtx.currentTime, 0.05);
-    } catch (err) {}
-  }
-
-  function muteAudio() {
-    try {
-      if (engineGain && audioCtx) {
-        engineGain.gain.setTargetAtTime(0.0001, audioCtx.currentTime, 0.05);
-      }
     } catch (e) {}
   }
-
+  function muteAudio() {
+    try {
+      if (engineGain && audioCtx) engineGain.gain.setTargetAtTime(0.0001, audioCtx.currentTime, 0.05);
+    } catch (e) {}
+  }
   function playStarChime() {
     try {
       if (!audioCtx) return;
@@ -749,16 +819,15 @@ if (typeof THREE === 'undefined') {
     } catch (e) {}
   }
 
-  // Three.js Scene Setup
+  // Three.js Setup
   const canvas = document.getElementById('gameCanvas');
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.shadowMap.enabled = false;
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x0b132b);
-  scene.fog = new THREE.FogExp2(0x0b132b, 0.0042);
+  scene.background = new THREE.Color(LEVELS[0].sky);
+  scene.fog = new THREE.FogExp2(LEVELS[0].fog, 0.004);
 
   const camera = new THREE.PerspectiveCamera(62, window.innerWidth / window.innerHeight, 0.1, 450);
   camera.position.set(0, 3.6, 7.5);
@@ -769,8 +838,7 @@ if (typeof THREE === 'undefined') {
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
-  // Lights
-  const hemiLight = new THREE.HemisphereLight(0x93c5fd, 0x1e293b, 1.15);
+  const hemiLight = new THREE.HemisphereLight(0xffffff, 0x1e293b, 1.15);
   scene.add(hemiLight);
   const dirLight = new THREE.DirectionalLight(0xffffff, 1.1);
   dirLight.position.set(25, 45, 20);
@@ -786,32 +854,28 @@ if (typeof THREE === 'undefined') {
     ctx.lineWidth = 10;
     ctx.strokeRect(5, 5, 502, 118);
     ctx.fillStyle = fg;
-    ctx.font = '900 42px sans-serif';
+    ctx.font = '900 40px sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(text, 256, 66);
     return new THREE.CanvasTexture(c);
   }
 
-  // Road & Environment
   const ROAD_WIDTH = 16;
-  const roadMesh = new THREE.Mesh(
-    new THREE.PlaneGeometry(ROAD_WIDTH, 900),
-    new THREE.MeshLambertMaterial({ color: 0x1e293b })
-  );
+  const roadMat = new THREE.MeshLambertMaterial({ color: LEVELS[0].road });
+  const roadMesh = new THREE.Mesh(new THREE.PlaneGeometry(ROAD_WIDTH, 900), roadMat);
   roadMesh.rotation.x = -Math.PI / 2;
   roadMesh.position.z = -350;
   scene.add(roadMesh);
 
-  const grassMesh = new THREE.Mesh(
-    new THREE.PlaneGeometry(300, 900),
-    new THREE.MeshLambertMaterial({ color: 0x064e3b })
-  );
+  const grassMat = new THREE.MeshLambertMaterial({ color: LEVELS[0].grass });
+  const grassMesh = new THREE.Mesh(new THREE.PlaneGeometry(320, 900), grassMat);
   grassMesh.rotation.x = -Math.PI / 2;
   grassMesh.position.set(0, -0.05, -350);
   scene.add(grassMesh);
 
   const worldObjects = [];
+  const sceneryPillars = [];
   const stars = [];
   const confettiParticles = [];
 
@@ -839,67 +903,65 @@ if (typeof THREE === 'undefined') {
     worldObjects.push(cL, cR);
   }
 
+  // Map-themed roadside towers/pillars that change color each stage
+  const pillarMat = new THREE.MeshLambertMaterial({ color: LEVELS[0].pillar });
+  for (let i = 0; i < 24; i++) {
+    const z = -25 - i * 32;
+    const side = (i % 2 === 0) ? -1 : 1;
+    const h = 5 + (i % 4) * 3.5;
+    const p = new THREE.Mesh(new THREE.BoxGeometry(2.2, h, 2.2), pillarMat);
+    p.position.set(side * (ROAD_WIDTH / 2 + 5.5), h / 2, z);
+    scene.add(p);
+    sceneryPillars.push(p);
+    worldObjects.push(p);
+  }
+
   // Göktuğ Champion Banners
   const bannerTexts = [
     { txt: '🏆 GÖKTUĞ ŞAMPİYON! 🏆', bg: '#0f172a', fg: '#facc15', border: '#38bdf8' },
     { txt: '⚡ HARİKASIN GÖKTUĞ! ⚡', bg: '#1d4ed8', fg: '#ffffff', border: '#facc15' },
     { txt: '🚀 GO GÖKTUĞ GO! 🚀', bg: '#b91c1c', fg: '#fef08a', border: '#ffffff' }
   ];
-
-  for (let i = 0; i < 6; i++) {
-    const z = -60 - i * 130;
+  for (let i = 0; i < 5; i++) {
+    const z = -70 - i * 145;
     const info = bannerTexts[i % bannerTexts.length];
     const tex = makeSignTexture(info.txt, info.bg, info.fg, info.border);
-
     const archGroup = new THREE.Group();
     const postGeo = new THREE.BoxGeometry(0.6, 7.5, 0.6);
     const postMat = new THREE.MeshLambertMaterial({ color: 0x334155 });
     const pL = new THREE.Mesh(postGeo, postMat); pL.position.set(-ROAD_WIDTH/2 - 0.5, 3.75, 0);
     const pR = new THREE.Mesh(postGeo, postMat); pR.position.set(ROAD_WIDTH/2 + 0.5, 3.75, 0);
-    const board = new THREE.Mesh(
-      new THREE.BoxGeometry(ROAD_WIDTH + 1.6, 2.4, 0.4),
-      new THREE.MeshBasicMaterial({ map: tex })
-    );
+    const board = new THREE.Mesh(new THREE.BoxGeometry(ROAD_WIDTH + 1.6, 2.4, 0.4), new THREE.MeshBasicMaterial({ map: tex }));
     board.position.set(0, 6.8, 0);
     archGroup.add(pL, pR, board);
     archGroup.position.z = z;
     scene.add(archGroup);
     worldObjects.push(archGroup);
-
-    const sideTex = makeSignTexture('GÖKTUĞ #1 ⭐', '#0284c7', '#ffffff', '#facc15');
-    const sideSign = new THREE.Mesh(
-      new THREE.BoxGeometry(4.2, 1.5, 0.3),
-      new THREE.MeshBasicMaterial({ map: sideTex })
-    );
-    const side = (i % 2 === 0) ? -1 : 1;
-    sideSign.position.set(side * (ROAD_WIDTH / 2 + 3.6), 2.2, z + 45);
-    sideSign.rotation.y = side * -0.35;
-    scene.add(sideSign);
-    worldObjects.push(sideSign);
   }
 
   // Collectible Golden Stars
   const starGeo = new THREE.OctahedronGeometry(0.85, 0);
   const starMat = new THREE.MeshPhongMaterial({ color: 0xfacc15, emissive: 0xca8a04, shininess: 90 });
-  for (let i = 0; i < 14; i++) {
+  for (let i = 0; i < 12; i++) {
     const s = new THREE.Mesh(starGeo, starMat);
-    s.position.set((Math.random() - 0.5) * (ROAD_WIDTH - 3.5), 1.1, -45 - i * 52);
+    s.position.set((Math.random() - 0.5) * (ROAD_WIDTH - 3.5), 1.1, -40 - i * 48);
     scene.add(s);
     stars.push(s);
   }
 
-  // Build Player Car
+  // Player Car
   let bodyMat, brakeLightMat, reverseLightMat, flameL, flameR;
   function buildPlayerCar() {
     const car = new THREE.Group();
-
     bodyMat = new THREE.MeshPhongMaterial({ color: CARS[0].color, shininess: 80 });
     const chassis = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.75, 4.4), bodyMat);
     chassis.position.y = 0.65;
     car.add(chassis);
 
-    const cabinMat = new THREE.MeshPhongMaterial({ color: 0x0f172a, shininess: 100 });
-    const cabin = new THREE.Mesh(new THREE.BoxGeometry(1.75, 0.62, 2.2), cabinMat);
+    const cabin = new THREE.Mesh(
+      new THREE.BoxGeometry(1.75, 0.62, 2.2),
+      new THREE.MeshPhongMaterial({ color: 0x0f172a, shininess: 100 })
+    );
     cabin.position.set(0, 1.25, -0.15);
     car.add(cabin);
 
@@ -915,15 +977,13 @@ if (typeof THREE === 'undefined') {
     brakeLightMat = new THREE.MeshBasicMaterial({ color: 0x7f1d1d });
     const tailL = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.18, 0.08), brakeLightMat);
     tailL.position.set(-0.72, 0.78, 2.21);
-    const tailR = tailL.clone();
-    tailR.position.x = 0.72;
+    const tailR = tailL.clone(); tailR.position.x = 0.72;
     car.add(tailL, tailR);
 
     reverseLightMat = new THREE.MeshBasicMaterial({ color: 0x334155 });
     const revL = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.14, 0.08), reverseLightMat);
     revL.position.set(-0.42, 0.78, 2.21);
-    const revR = revL.clone();
-    revR.position.x = 0.42;
+    const revR = revL.clone(); revR.position.x = 0.42;
     car.add(revL, revR);
 
     const flameGeo = new THREE.ConeGeometry(0.22, 1.4, 8);
@@ -955,7 +1015,7 @@ if (typeof THREE === 'undefined') {
     if (bodyMat) bodyMat.color.setHex(carSpec.color);
   }
 
-  // Traffic Opponent Cars
+  // Traffic Cars
   const trafficCars = [];
   const trafficColors = [0x9333ea, 0x10b981, 0xf97316, 0xec4899];
   for (let i = 0; i < 5; i++) {
@@ -972,7 +1032,7 @@ if (typeof THREE === 'undefined') {
     c.position.y = 1.25;
     tc.add(b, c);
     tc.position.set((i - 2) * 2.8, 0, -90 - i * 110);
-    tc.userData = { speed: 75 + (i % 3) * 18 };
+    tc.userData = { speed: LEVELS[0].trafficSpeed + (i % 3) * 14 };
     scene.add(tc);
     trafficCars.push(tc);
   }
@@ -1005,33 +1065,58 @@ if (typeof THREE === 'undefined') {
     toastTimer = setTimeout(() => toastEl.classList.remove('show'), 1800);
   }
 
+  // Apply Map/Stage Visuals
+  function applyLevelTheme(lvlIdx) {
+    const lvl = LEVELS[lvlIdx] || LEVELS[0];
+    scene.background.setHex(lvl.sky);
+    scene.fog.color.setHex(lvl.fog);
+    roadMat.color.setHex(lvl.road);
+    grassMat.color.setHex(lvl.grass);
+    pillarMat.color.setHex(lvl.pillar);
+    for (let i = 0; i < trafficCars.length; i++) {
+      trafficCars[i].userData.speed = lvl.trafficSpeed + (i % 3) * 14;
+    }
+    document.getElementById('pauseMapInfo').textContent = lvl.name;
+  }
+
   // Game State
   let gameStarted = false;
   let gamePaused = false;
+  let stageEnded = false;
   let speedKmh = 0;
   let nosEnergy = 100;
-  let starCount = 0;
-  let elapsedSec = 0;
+  let stageStars = 0;
+  let totalStars = 0;
+  let timeLeft = LEVELS[0].timeLimit;
 
   const hudSpeed = document.getElementById('hudSpeed');
-  const hudGear  = document.getElementById('hudGear');
+  const hudLevel = document.getElementById('hudLevel');
   const nosFill  = document.getElementById('nosFill');
   const hudStars = document.getElementById('hudStars');
   const hudTime  = document.getElementById('hudTime');
   const speedLinesEl = document.getElementById('speedLines');
   const pauseModal = document.getElementById('pauseModal');
+  const endModal = document.getElementById('endModal');
   const startScreen = document.getElementById('startScreen');
 
-  function resetRaceState() {
+  function setupLevel(lvlIdx, keepTotalStars) {
+    currentLevelIdx = lvlIdx;
+    const lvl = LEVELS[currentLevelIdx];
+    applyLevelTheme(currentLevelIdx);
     resetInputs();
     setGear('D');
     speedKmh = 0;
     nosEnergy = 100;
-    starCount = 0;
-    elapsedSec = 0;
+    stageStars = 0;
+    if (!keepTotalStars) totalStars = 0;
+    timeLeft = lvl.timeLimit;
+    stageEnded = false;
+
     playerCar.position.set(0, 0, 0);
     playerCar.rotation.set(0, 0, 0);
-    camera.position.set(0, 3.6, 7.5);
+    const cm = CAM_MODES[camModeIdx];
+    camera.position.set(cm.x, cm.y, cm.z);
+    camera.lookAt(cm.x, cm.lookY, cm.lookZ);
     camera.fov = 62;
     camera.updateProjectionMatrix();
     flameL.visible = false;
@@ -1042,65 +1127,120 @@ if (typeof THREE === 'undefined') {
       trafficCars[i].position.set((i - 2) * 2.8, 0, -90 - i * 110);
     }
     for (let i = 0; i < stars.length; i++) {
-      stars[i].position.set((Math.random() - 0.5) * (ROAD_WIDTH - 3.5), 1.1, -45 - i * 52);
+      stars[i].position.set((Math.random() - 0.5) * (ROAD_WIDTH - 3.5), 1.1, -40 - i * 48);
     }
 
     hudSpeed.textContent = '0';
-    hudGear.textContent = 'D1';
+    hudLevel.textContent = (currentLevelIdx + 1) + '/' + LEVELS.length;
     nosFill.style.width = '100%';
-    hudStars.textContent = '0 ⭐';
-    hudTime.textContent = '00:00';
+    hudStars.textContent = '0/' + lvl.targetStars;
+    hudTime.textContent = Math.ceil(timeLeft) + 's';
+    hudTime.classList.remove('time-urgent');
   }
 
-  // Start Race
+  function openStageModal(won) {
+    stageEnded = true;
+    resetInputs();
+    muteAudio();
+    const lvl = LEVELS[currentLevelIdx];
+    const titleEl = document.getElementById('endTitle');
+    const descEl = document.getElementById('endDesc');
+    const nextBtn = document.getElementById('btnNextAction');
+
+    if (won) {
+      const isFinal = currentLevelIdx >= LEVELS.length - 1;
+      titleEl.textContent = isFinal ? '👑 ŞAMPİYON GÖKTUĞ!' : '🏆 BÖLÜM TAMAMLANDI!';
+      descEl.textContent = isFinal
+        ? `Tüm 4 haritayı bitirdin! Toplam Yıldız: ${totalStars} ⭐`
+        : `${lvl.name} geçildi! (${stageStars}/${lvl.targetStars} yıldız) Yeni haritaya geçmeye hazır mısın?`;
+      nextBtn.style.display = 'flex';
+      nextBtn.textContent = isFinal ? '🏁 YENİ ŞAMPİYONA BAŞLAT' : '➡ SONRAKİ HARİTA';
+      nextBtn.dataset.mode = isFinal ? 'restartAll' : 'nextLevel';
+    } else {
+      titleEl.textContent = '⏱️ SÜRE DOLDU!';
+      descEl.textContent = `${stageStars}/${lvl.targetStars} yıldız topladın. Biraz daha hızlı ve turboyla tekrar dene Göktuğ!`;
+      nextBtn.style.display = 'none';
+    }
+    endModal.classList.add('open');
+  }
+
   document.getElementById('btnStart').addEventListener('click', () => {
     initAudio();
     updateCarPaint(CARS[selectedCarIdx]);
-    resetRaceState();
+    setupLevel(0, false);
     startScreen.style.display = 'none';
     pauseModal.classList.remove('open');
+    endModal.classList.remove('open');
     gamePaused = false;
     gameStarted = true;
-    showToast('🏁 HADİ GÖKTUĞ, ŞAMPİYONLUK SENİN! 🏆');
+    showToast('🏁 ' + LEVELS[0].name);
   });
 
-  // Pause / Menu Button
   document.getElementById('btnPause').addEventListener('click', () => {
-    if (!gameStarted) return;
+    if (!gameStarted || stageEnded) return;
     gamePaused = true;
     resetInputs();
     muteAudio();
     pauseModal.classList.add('open');
   });
 
-  // Resume Race
   document.getElementById('btnResume').addEventListener('click', () => {
     pauseModal.classList.remove('open');
     gamePaused = false;
     initAudio();
   });
 
-  // Restart Race
   document.getElementById('btnRestart').addEventListener('click', () => {
     pauseModal.classList.remove('open');
-    resetRaceState();
+    setupLevel(currentLevelIdx, true);
     gamePaused = false;
     gameStarted = true;
     initAudio();
-    showToast('🔄 YENİDEN BAŞLADI, BAŞARILAR GÖKTUĞ!');
+    showToast('🔄 BÖLÜM YENİDEN BAŞLADI!');
   });
 
-  // Exit to Main Menu
   document.getElementById('btnExit').addEventListener('click', () => {
     pauseModal.classList.remove('open');
-    resetRaceState();
+    setupLevel(0, false);
     gamePaused = false;
     gameStarted = false;
     muteAudio();
     startScreen.style.display = 'flex';
   });
 
-  // Main Game Loop
+  document.getElementById('btnNextAction').addEventListener('click', (e) => {
+    endModal.classList.remove('open');
+    const mode = e.currentTarget.dataset.mode;
+    if (mode === 'restartAll') {
+      setupLevel(0, false);
+      showToast('🏁 YENİ ŞAMPİYONA BAŞLADI!');
+    } else {
+      setupLevel(currentLevelIdx + 1, true);
+      showToast('🗺️ ' + LEVELS[currentLevelIdx].name);
+    }
+    gamePaused = false;
+    gameStarted = true;
+    initAudio();
+  });
+
+  document.getElementById('btnRetryLevel').addEventListener('click', () => {
+    endModal.classList.remove('open');
+    setupLevel(currentLevelIdx, true);
+    gamePaused = false;
+    gameStarted = true;
+    initAudio();
+    showToast('🔄 TEKRAR DENE GÖKTUĞ!');
+  });
+
+  document.getElementById('btnEndExit').addEventListener('click', () => {
+    endModal.classList.remove('open');
+    setupLevel(0, false);
+    gamePaused = false;
+    gameStarted = false;
+    muteAudio();
+    startScreen.style.display = 'flex';
+  });
+
   let lastTime = performance.now();
   function animate(now) {
     requestAnimationFrame(animate);
@@ -1108,13 +1248,22 @@ if (typeof THREE === 'undefined') {
     lastTime = now;
 
     const carSpec = CARS[selectedCarIdx];
+    const lvl = LEVELS[currentLevelIdx] || LEVELS[0];
 
-    if (gameStarted && !gamePaused) {
-      elapsedSec += dt;
+    if (gameStarted && !gamePaused && !stageEnded) {
+      timeLeft = Math.max(0, timeLeft - dt);
+      const secCeil = Math.ceil(timeLeft);
+      hudTime.textContent = secCeil + 's';
+      if (secCeil <= 10) hudTime.classList.add('time-urgent');
+      else hudTime.classList.remove('time-urgent');
 
-      const turboActive = input.turbo && nosEnergy > 2 && input.gear === 'D' && speedKmh > 25;
+      if (timeLeft <= 0) {
+        openStageModal(false);
+      }
+
+      const turboActive = input.turbo && nosEnergy > 2 && input.gear === 'D' && speedKmh > 20;
       if (turboActive) {
-        nosEnergy = Math.max(0, nosEnergy - 28 * dt);
+        nosEnergy = Math.max(0, nosEnergy - 26 * dt);
         flameL.visible = true;
         flameR.visible = true;
         flameL.scale.z = 0.85 + Math.random() * 0.55;
@@ -1122,7 +1271,7 @@ if (typeof THREE === 'undefined') {
         speedLinesEl.classList.add('active');
         camera.fov += (75 - camera.fov) * 8 * dt;
       } else {
-        nosEnergy = Math.min(100, nosEnergy + 7 * dt);
+        nosEnergy = Math.min(100, nosEnergy + 8 * dt);
         flameL.visible = false;
         flameR.visible = false;
         speedLinesEl.classList.remove('active');
@@ -1141,22 +1290,14 @@ if (typeof THREE === 'undefined') {
         brakeLightMat.color.setHex(0x7f1d1d);
         if (input.gear === 'D') {
           reverseLightMat.color.setHex(0x334155);
-          if (speedKmh < 0) {
-            speedKmh = Math.min(0, speedKmh + 110 * dt);
-          } else if (input.gas) {
-            speedKmh = Math.min(topSpeed, speedKmh + accelRate * dt);
-          } else {
-            speedKmh = Math.max(0, speedKmh - 26 * dt);
-          }
+          if (speedKmh < 0) speedKmh = Math.min(0, speedKmh + 110 * dt);
+          else if (input.gas) speedKmh = Math.min(topSpeed, speedKmh + accelRate * dt);
+          else speedKmh = Math.max(0, speedKmh - 26 * dt);
         } else {
           reverseLightMat.color.setHex(0xffffff);
-          if (speedKmh > 0) {
-            speedKmh = Math.max(0, speedKmh - 120 * dt);
-          } else if (input.gas) {
-            speedKmh = Math.max(-85, speedKmh - 42 * dt);
-          } else {
-            speedKmh = Math.min(0, speedKmh + 28 * dt);
-          }
+          if (speedKmh > 0) speedKmh = Math.max(0, speedKmh - 120 * dt);
+          else if (input.gas) speedKmh = Math.max(-85, speedKmh - 42 * dt);
+          else speedKmh = Math.min(0, speedKmh + 28 * dt);
         }
       }
 
@@ -1187,14 +1328,22 @@ if (typeof THREE === 'undefined') {
         }
         const dx = Math.abs(s.position.x - playerCar.position.x);
         const dz = Math.abs(s.position.z - playerCar.position.z);
-        if (dx < 1.8 && dz < 2.5) {
-          starCount++;
+        if (dx < 1.9 && dz < 2.6) {
+          stageStars++;
+          totalStars++;
           nosEnergy = Math.min(100, nosEnergy + 35);
           playStarChime();
           spawnConfetti(s.position.x, 1.4, s.position.z);
-          showToast(starCount % 3 === 0 ? '🏆 ŞAMPİYON GÖKTUĞ! +35% TURBO' : '⭐ SÜPERSİN GÖKTUĞ! ⭐');
           s.position.z = -730;
           s.position.x = (Math.random() - 0.5) * (ROAD_WIDTH - 3.5);
+          hudStars.textContent = stageStars + '/' + lvl.targetStars;
+
+          if (stageStars >= lvl.targetStars) {
+            openStageModal(true);
+            break;
+          } else {
+            showToast('⭐ SÜPERSİN GÖKTUĞ! (' + stageStars + '/' + lvl.targetStars + ')');
+          }
         }
       }
 
@@ -1231,22 +1380,23 @@ if (typeof THREE === 'undefined') {
         }
       }
 
-      camera.position.x += (playerCar.position.x * 0.72 - camera.position.x) * 7 * dt;
+      // Camera mode smoothing
+      const cm = CAM_MODES[camModeIdx];
+      const swayX = cm.id === 'dynamic' ? steerDir * 0.85 : 0;
+      const targetX = cm.id === 'hood' ? playerCar.position.x : (playerCar.position.x * 0.72 + swayX);
+      camera.position.x += (targetX - camera.position.x) * 8 * dt;
+      camera.position.y += (cm.y - camera.position.y) * 6 * dt;
+      camera.position.z += (cm.z - camera.position.z) * 6 * dt;
+      camera.lookAt(playerCar.position.x * (cm.id === 'hood' ? 0.95 : 0.45), cm.lookY, cm.lookZ);
 
       if (engineOsc && audioCtx) {
         const absSpd = Math.abs(speedKmh);
-        const gearIdx = Math.min(6, Math.max(1, Math.floor(absSpd / 55) + 1));
         const baseFreq = 48 + (absSpd % 60) * 1.45 + (turboActive ? 38 : 0);
         engineOsc.frequency.setTargetAtTime(baseFreq, audioCtx.currentTime, 0.05);
-        hudGear.textContent = input.gear === 'R' ? 'R' : ('D' + gearIdx);
       }
 
       hudSpeed.textContent = Math.round(Math.abs(speedKmh));
       nosFill.style.width = nosEnergy.toFixed(0) + '%';
-      hudStars.textContent = starCount + ' ⭐';
-      const mins = String(Math.floor(elapsedSec / 60)).padStart(2, '0');
-      const secs = String(Math.floor(elapsedSec % 60)).padStart(2, '0');
-      hudTime.textContent = mins + ':' + secs;
     } else if (!gameStarted) {
       playerCar.rotation.y = Math.sin(now * 0.0012) * 0.25;
     }
